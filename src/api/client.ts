@@ -1,4 +1,13 @@
 import { logger } from '../lib/logger';
+import type {
+  ElecSummaryApiResponse,
+  ApiItemsResponse,
+  RawPriceAndDemandItem,
+  RawFuelMixItem,
+  RawRenewPenItem,
+  RawAvgPriceItem,
+  RawMarketPulseItem,
+} from './types';
 
 const API_KEY = import.meta.env.VITE_AEMO_API_KEY ?? '';
 
@@ -27,30 +36,30 @@ export async function aemoFetch<T>(path: string, params?: Record<string, string>
 // NEM endpoints
 export const nem = {
   elecSummary: () =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/elecSummary'),
+    aemoFetch<ElecSummaryApiResponse>('/NEM/v1/PWS/NEMDashboard/elecSummary'),
 
   priceAndDemand: (region: string, timeScale: '5MIN' | '30MIN' = '5MIN') =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/priceAndDemand', { region, TimeScale: timeScale }),
+    aemoFetch<ApiItemsResponse<RawPriceAndDemandItem>>('/NEM/v1/PWS/NEMDashboard/priceAndDemand', { region, TimeScale: timeScale }),
 
   fuelMix: (region: string, type: string = 'CURRENT') =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/fuelMix', { region, Type: type }),
+    aemoFetch<ApiItemsResponse<RawFuelMixItem>>('/NEM/v1/PWS/NEMDashboard/fuelMix', { region, Type: type }),
 
   renewablePenetration: (region: string) =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/renewablePenetration', { region }),
+    aemoFetch<ApiItemsResponse<RawRenewPenItem>>('/NEM/v1/PWS/NEMDashboard/renewablePenetration', { region }),
 
   dailyAveragePrices: (year: string, month: string) =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/dailyAveragePrices', { year, month }),
+    aemoFetch<ApiItemsResponse<RawAvgPriceItem>>('/NEM/v1/PWS/NEMDashboard/dailyAveragePrices', { year, month }),
 
   monthlyAveragePrices: (year: string, month: string) =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/monthlyAveragePrices', { year, month }),
+    aemoFetch<ApiItemsResponse<RawAvgPriceItem>>('/NEM/v1/PWS/NEMDashboard/monthlyAveragePrices', { year, month }),
 
   annualAveragePrices: () =>
-    aemoFetch<any>('/NEM/v1/PWS/NEMDashboard/annualAveragePrices'),
+    aemoFetch<ApiItemsResponse<RawAvgPriceItem>>('/NEM/v1/PWS/NEMDashboard/annualAveragePrices'),
 
 };
 
 // WEM endpoints
 export const wem = {
   marketPulse: () =>
-    aemoFetch<any>('/WEM/v1/PWS/WEMDashboard/marketPulse'),
+    aemoFetch<ApiItemsResponse<RawMarketPulseItem>>('/WEM/v1/PWS/WEMDashboard/marketPulse'),
 };

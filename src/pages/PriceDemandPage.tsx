@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { usePriceAndDemand } from '../hooks/usePriceAndDemand';
 import { useMarketPulse } from '../hooks/useMarketPulse';
@@ -9,7 +9,7 @@ import CompareToggle from '../components/controls/CompareToggle';
 import ViewModeToggle, { type ViewMode } from '../components/controls/ViewModeToggle';
 import KpiCard from '../components/charts/KpiCard';
 import ReactECharts from 'echarts-for-react';
-import { useTheme } from '../theme/ThemeContext';
+import { useTheme } from '../theme/useTheme';
 import { darkTheme, lightTheme } from '../theme/echarts-theme';
 import { NEM_REGIONS, REGION_LABELS, type TimeScale } from '../api/types';
 import type { EChartsOption } from 'echarts';
@@ -31,27 +31,40 @@ export default function PriceDemandPage() {
 
   const isWem = region === 'WA';
 
-  // Auto-disable compare when switching to WA
-  useEffect(() => {
-    if (isWem && compareEnabled) setCompareEnabled(false);
-  }, [isWem, compareEnabled]);
+  // Derive effective compare state (WEM doesn't support compare)
+  const effectiveCompare = compareEnabled && !isWem;
 
-  // If region B matches region A, pick a different one
-  useEffect(() => {
-    if (compareEnabled && regionB === region) {
+  // Derive effective regionB (auto-fix when it matches regionA)
+  const effectiveRegionB = (effectiveCompare && regionB === region)
+    ? (NEM_COMPARE_REGIONS.find(r => r.id !== region)?.id ?? regionB)
+    : regionB;
+
+  const handleRegionChange = (newRegion: string) => {
+    setRegion(newRegion);
+    const newIsWem = newRegion === 'WA';
+    if (newIsWem) setCompareEnabled(false);
+    if (compareEnabled && !newIsWem && regionB === newRegion) {
+      const alt = NEM_COMPARE_REGIONS.find(r => r.id !== newRegion);
+      if (alt) setRegionB(alt.id);
+    }
+  };
+
+  const handleCompareChange = (enabled: boolean) => {
+    setCompareEnabled(enabled);
+    if (enabled && regionB === region) {
       const alt = NEM_COMPARE_REGIONS.find(r => r.id !== region);
       if (alt) setRegionB(alt.id);
     }
-  }, [compareEnabled, region, regionB]);
+  };
 
   // NEM data (only fetch when not WA)
   const { data: nemData, isLoading: nemLoading, isError: nemError } = usePriceAndDemand(region, timeScale, !isWem);
-  const { data: nemDataB, isLoading: nemLoadingB } = usePriceAndDemand(regionB, timeScale, compareEnabled && !isWem);
+  const { data: nemDataB, isLoading: nemLoadingB } = usePriceAndDemand(effectiveRegionB, timeScale, effectiveCompare);
 
   // WEM data (only fetch when WA)
   const { data: wemData, isLoading: wemLoading, isError: wemError } = useMarketPulse(isWem);
 
-  const isLoading = isWem ? wemLoading : (nemLoading || (compareEnabled && nemLoadingB));
+  const isLoading = isWem ? wemLoading : (nemLoading || (effectiveCompare && nemLoadingB));
   const isError = isWem ? wemError : nemError;
 
   // Derive chart data for Region A
@@ -72,15 +85,15 @@ export default function PriceDemandPage() {
     prices = pts.map(p => p.rrp);
     demands = pts.map(p => p.totalDemand);
     const label = REGION_LABELS[region] ?? region;
-    chartTitle = compareEnabled
-      ? `${label} vs ${REGION_LABELS[regionB] ?? regionB} - Price & Demand (${timeScale})`
+    chartTitle = effectiveCompare
+      ? `${label} vs ${REGION_LABELS[effectiveRegionB] ?? effectiveRegionB} - Price & Demand (${timeScale})`
       : `${label} - Price & Demand (${timeScale})`;
   }
 
   // Derive chart data for Region B
   let pricesB: number[] = [];
   let demandsB: number[] = [];
-  if (compareEnabled && !isWem) {
+  if (effectiveCompare) {
     const ptsB = Array.isArray(nemDataB) ? nemDataB : [];
     pricesB = ptsB.map(p => p.rrp);
     demandsB = ptsB.map(p => p.totalDemand);
@@ -92,7 +105,7 @@ export default function PriceDemandPage() {
 
   const regionBOptions = NEM_COMPARE_REGIONS.filter(r => r.id !== region);
   const regionALabel = REGION_LABELS[region] ?? region;
-  const regionBLabel = REGION_LABELS[regionB] ?? regionB;
+  const regionBLabel = REGION_LABELS[effectiveRegionB] ?? effectiveRegionB;
 
   // WEM chart option
   const fmtTime = (val: string) => {
@@ -174,7 +187,7 @@ export default function PriceDemandPage() {
   );
 
   // For split mode, derive Region B categories separately
-  const categoriesB = compareEnabled && !isWem
+  const categoriesB = effectiveCompare
     ? (Array.isArray(nemDataB) ? nemDataB : []).map(p => p.dt)
     : [];
 
@@ -186,21 +199,21 @@ export default function PriceDemandPage() {
           <RegionSelector
             regions={ALL_REGIONS}
             selected={region}
-            onChange={setRegion}
+            onChange={handleRegionChange}
           />
           {!isWem && <TimeScaleToggle selected={timeScale} onChange={setTimeScale} />}
           <CompareToggle
             enabled={compareEnabled}
-            onChange={setCompareEnabled}
+            onChange={handleCompareChange}
             disabled={isWem}
           />
-          {compareEnabled && !isWem && (
+          {effectiveCompare && (
             <>
               <div>
                 <div className="region-label">vs</div>
                 <RegionSelector
                   regions={regionBOptions}
-                  selected={regionB}
+                  selected={effectiveRegionB}
                   onChange={setRegionB}
                 />
               </div>
@@ -224,7 +237,7 @@ export default function PriceDemandPage() {
         <div className="card">
           <ReactECharts option={wemOption} style={{ height: 450 }} notMerge />
         </div>
-      ) : compareEnabled && viewMode === 'split' ? (
+      ) : effectiveCompare && viewMode === 'split' ? (
         <div className="comparison-split">
           {renderSplitChart(categories, prices, demands, regionALabel)}
           {renderSplitChart(categoriesB, pricesB, demandsB, regionBLabel)}
@@ -237,11 +250,11 @@ export default function PriceDemandPage() {
             priceSeries={prices}
             demandSeries={demands}
             height={450}
-            {...(compareEnabled && {
+            {...(effectiveCompare && {
               regionALabel,
               regionBLabel,
               regionAId: region,
-              regionBId: regionB,
+              regionBId: effectiveRegionB,
               priceSeriesB: pricesB,
               demandSeriesB: demandsB,
             })}

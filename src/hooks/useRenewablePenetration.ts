@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { nem } from '../api/client';
 import { isRenewable } from '../theme/fuel-colors';
+import type { ApiItemsResponse, RawRenewPenItem } from '../api/types';
 
 interface RenewPenData {
   currentPenetration: number;
@@ -17,15 +18,15 @@ export function useRenewablePenetration(region: string, enabled = true) {
     queryFn: () => nem.renewablePenetration(region),
     staleTime: 300_000,
     enabled,
-    select: (raw: any): RenewPenData => {
-      const items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawRenewPenItem>): RenewPenData => {
+      const items: RawRenewPenItem[] = raw?.data?.items ?? [];
 
       // Items have type "Min" or "Max" with fuel breakdowns for each
       // The "Max" record date is when renewable penetration was highest
-      const maxItems = items.filter((i: any) => i.type === 'Max');
-      const minItems = items.filter((i: any) => i.type === 'Min');
+      const maxItems = items.filter((i: RawRenewPenItem) => i.type === 'Max');
+      const minItems = items.filter((i: RawRenewPenItem) => i.type === 'Min');
 
-      const calcRenewPct = (fuels: any[]) => {
+      const calcRenewPct = (fuels: RawRenewPenItem[]) => {
         let totalRenew = 0, totalAll = 0;
         for (const f of fuels) {
           const s = f.supply ?? 0;
@@ -41,7 +42,7 @@ export function useRenewablePenetration(region: string, enabled = true) {
       const minPenetration = calcRenewPct(minItems);
 
       // Use the max record as "current" fuel mix
-      const fuelMix = maxItems.map((i: any) => ({
+      const fuelMix = maxItems.map((i: RawRenewPenItem) => ({
         fuelType: i.fuelType,
         supply: i.supply ?? 0,
       }));

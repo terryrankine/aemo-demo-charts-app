@@ -1,5 +1,5 @@
 import ReactECharts from 'echarts-for-react';
-import { useTheme } from '../../theme/ThemeContext';
+import { useTheme } from '../../theme/useTheme';
 import { darkTheme, lightTheme } from '../../theme/echarts-theme';
 import { REGION_COLORS } from '../../theme/fuel-colors';
 import type { EChartsOption } from 'echarts';

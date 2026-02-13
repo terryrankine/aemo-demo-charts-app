@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { useTheme } from '../../theme/ThemeContext';
+import { useTheme } from '../../theme/useTheme';
 import './Sidebar.css';
 
 const NAV_ITEMS = [

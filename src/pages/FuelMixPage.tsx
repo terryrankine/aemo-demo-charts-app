@@ -1,15 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFuelMix } from '../hooks/useFuelMix';
 import HorizontalBar from '../components/charts/HorizontalBar';
 import RegionSelector from '../components/controls/RegionSelector';
 import TimeRangePicker from '../components/controls/TimeRangePicker';
 import CompareToggle from '../components/controls/CompareToggle';
 import ViewModeToggle, { type ViewMode } from '../components/controls/ViewModeToggle';
-import { NEM_REGIONS, REGION_LABELS, type FuelMixPeriod } from '../api/types';
+import { NEM_REGIONS, REGION_LABELS, type FuelMixPeriod, type FuelMixItem } from '../api/types';
 import { REGION_COLORS, getFuelColor } from '../theme/fuel-colors';
+import type { BarItem } from '../components/charts/HorizontalBar';
 import './Pages.css';
 
 const REGION_OPTIONS = [{ id: 'NEM', label: 'NEM' }, ...NEM_REGIONS];
+
+function getEffectiveRegionB(region: string, regionB: string, compareEnabled: boolean): string {
+  if (compareEnabled && regionB === region) {
+    return REGION_OPTIONS.find(r => r.id !== region)?.id ?? regionB;
+  }
+  return regionB;
+}
 
 export default function FuelMixPage() {
   const [region, setRegion] = useState('NEM');
@@ -18,40 +26,50 @@ export default function FuelMixPage() {
   const [regionB, setRegionB] = useState<string>('VIC1');
   const [viewMode, setViewMode] = useState<ViewMode>('overlay');
 
-  // If region B matches region A, pick a different one
-  useEffect(() => {
-    if (compareEnabled && regionB === region) {
+  const effectiveRegionB = getEffectiveRegionB(region, regionB, compareEnabled);
+
+  const handleRegionChange = (newRegion: string) => {
+    setRegion(newRegion);
+    if (compareEnabled && regionB === newRegion) {
+      const alt = REGION_OPTIONS.find(r => r.id !== newRegion);
+      if (alt) setRegionB(alt.id);
+    }
+  };
+
+  const handleCompareChange = (enabled: boolean) => {
+    setCompareEnabled(enabled);
+    if (enabled && regionB === region) {
       const alt = REGION_OPTIONS.find(r => r.id !== region);
       if (alt) setRegionB(alt.id);
     }
-  }, [compareEnabled, region, regionB]);
+  };
 
   const { data: fuelMix, isLoading, isError } = useFuelMix(region, period);
-  const { data: fuelMixB, isLoading: loadingB } = useFuelMix(regionB, period, compareEnabled);
+  const { data: fuelMixB, isLoading: loadingB } = useFuelMix(effectiveRegionB, period, compareEnabled);
 
-  const toBarItems = (data: any) =>
-    (data ?? []).map((item: any) => ({
-      name: item.fuelType ?? item.FUEL_TYPE ?? item.name ?? 'Unknown',
-      value: item.value ?? item.currentMW ?? item.MW ?? 0,
-      color: getFuelColor(item.fuelType ?? item.FUEL_TYPE ?? item.name ?? ''),
-    })).filter((i: any) => i.value > 0);
+  const toBarItems = (data: FuelMixItem[]): BarItem[] =>
+    data.map((item: FuelMixItem) => ({
+      name: item.fuelType ?? 'Unknown',
+      value: item.value ?? 0,
+      color: getFuelColor(item.fuelType ?? ''),
+    })).filter((i: BarItem) => i.value > 0);
 
-  const items = toBarItems(fuelMix);
-  const itemsBArr = toBarItems(fuelMixB);
-  const totalMW = items.reduce((sum: number, i: any) => sum + i.value, 0);
-  const totalMWB = itemsBArr.reduce((sum: number, i: any) => sum + i.value, 0);
+  const items = toBarItems(fuelMix ?? []);
+  const itemsBArr = toBarItems(fuelMixB ?? []);
+  const totalMW = items.reduce((sum: number, i: BarItem) => sum + i.value, 0);
+  const totalMWB = itemsBArr.reduce((sum: number, i: BarItem) => sum + i.value, 0);
 
   const regionBOptions = REGION_OPTIONS.filter(r => r.id !== region);
   const regionALabel = REGION_LABELS[region] ?? region;
-  const regionBLabelText = REGION_LABELS[regionB] ?? regionB;
+  const regionBLabelText = REGION_LABELS[effectiveRegionB] ?? effectiveRegionB;
   const unitLabel = period === 'CURRENT' ? 'MW' : 'MWh';
 
   const loading = isLoading || (compareEnabled && loadingB);
 
-  const renderPctGrid = (barItems: any[], total: number, label?: string) => (
+  const renderPctGrid = (barItems: BarItem[], total: number, label?: string) => (
     <div className="card fuel-pct-grid">
       {label && <div className="card-title">{label}</div>}
-      {barItems.map((item: any) => (
+      {barItems.map((item: BarItem) => (
         <div key={item.name} className="fuel-pct-item">
           <div className="fuel-pct-bar-bg">
             <div
@@ -79,12 +97,12 @@ export default function FuelMixPage() {
           <RegionSelector
             regions={REGION_OPTIONS}
             selected={region}
-            onChange={setRegion}
+            onChange={handleRegionChange}
           />
           <TimeRangePicker selected={period} onChange={setPeriod} />
           <CompareToggle
             enabled={compareEnabled}
-            onChange={setCompareEnabled}
+            onChange={handleCompareChange}
           />
           {compareEnabled && (
             <>
@@ -92,7 +110,7 @@ export default function FuelMixPage() {
                 <div className="region-label">vs</div>
                 <RegionSelector
                   regions={regionBOptions}
-                  selected={regionB}
+                  selected={effectiveRegionB}
                   onChange={setRegionB}
                 />
               </div>
@@ -162,7 +180,7 @@ export default function FuelMixPage() {
                   regionALabel,
                   regionBLabel: regionBLabelText,
                   regionAColor: REGION_COLORS[region] ?? '#4A90D9',
-                  regionBColor: REGION_COLORS[regionB] ?? '#E74C3C',
+                  regionBColor: REGION_COLORS[effectiveRegionB] ?? '#E74C3C',
                   itemsB: itemsBArr,
                 })}
               />

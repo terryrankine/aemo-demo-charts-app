@@ -1,7 +1,8 @@
 import ReactECharts from 'echarts-for-react';
-import { useTheme } from '../../theme/ThemeContext';
+import { useTheme } from '../../theme/useTheme';
 import { darkTheme, lightTheme } from '../../theme/echarts-theme';
 import type { EChartsOption } from 'echarts';
+import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 export interface BarItem {
   name: string;
@@ -60,11 +61,11 @@ export default function HorizontalBar({
         ...t.tooltip,
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
-        formatter: (params: any) => {
+        formatter: (params: CallbackDataParams | CallbackDataParams[]) => {
           const arr = Array.isArray(params) ? params : [params];
-          let html = `<strong>${arr[0]?.name}</strong><br/>`;
+          let html = `<strong>${arr[0]?.name ?? ''}</strong><br/>`;
           for (const p of arr) {
-            html += `${p.marker} ${p.seriesName}: ${p.value.toLocaleString()} ${unit}<br/>`;
+            html += `${String(p.marker ?? '')} ${p.seriesName ?? ''}: ${Number(p.value ?? 0).toLocaleString()} ${unit}<br/>`;
           }
           return html;
         },
@@ -108,7 +109,7 @@ export default function HorizontalBar({
           label: {
             show: true,
             position: 'right',
-            formatter: (p: any) => p.value > 0 ? `${p.value.toLocaleString()} ${unit}` : '',
+            formatter: (p: CallbackDataParams) => Number(p.value ?? 0) > 0 ? `${Number(p.value).toLocaleString()} ${unit}` : '',
             color: t.textStyle.color,
             fontSize: 10,
           },
@@ -122,7 +123,7 @@ export default function HorizontalBar({
           label: {
             show: true,
             position: 'right',
-            formatter: (p: any) => p.value > 0 ? `${p.value.toLocaleString()} ${unit}` : '',
+            formatter: (p: CallbackDataParams) => Number(p.value ?? 0) > 0 ? `${Number(p.value).toLocaleString()} ${unit}` : '',
             color: t.textStyle.color,
             fontSize: 10,
           },
@@ -144,9 +145,9 @@ export default function HorizontalBar({
       ...t.tooltip,
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
-      formatter: (params: any) => {
+      formatter: (params: CallbackDataParams | CallbackDataParams[]) => {
         const p = Array.isArray(params) ? params[0] : params;
-        return `${p.name}: ${p.value.toLocaleString()} ${unit}`;
+        return `${p.name ?? ''}: ${Number(p.value ?? 0).toLocaleString()} ${unit}`;
       },
     },
     grid: {
@@ -183,7 +184,7 @@ export default function HorizontalBar({
       label: {
         show: true,
         position: 'right',
-        formatter: (p: any) => `${p.value.toLocaleString()} ${unit}`,
+        formatter: (p: CallbackDataParams) => `${Number(p.value ?? 0).toLocaleString()} ${unit}`,
         color: t.textStyle.color,
         fontSize: 11,
       },

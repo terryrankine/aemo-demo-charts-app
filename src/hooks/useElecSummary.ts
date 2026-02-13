@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { nem } from '../api/client';
-import type { ElecSummaryRegion, InterconnectorFlow } from '../api/types';
+import type { ElecSummaryRegion, InterconnectorFlow, ElecSummaryApiResponse, RawElecSummaryRegion, RawInterconnectorFlow } from '../api/types';
 
 interface ElecSummaryData {
   regions: ElecSummaryRegion[];
@@ -14,14 +14,14 @@ export function useElecSummary(enabled = true) {
     staleTime: 300_000,
     refetchInterval: 300_000,
     enabled,
-    select: (raw: any): ElecSummaryData => {
+    select: (raw: ElecSummaryApiResponse): ElecSummaryData => {
       const summary = raw?.data?.summary ?? [];
 
       // Parse interconnector flows from all regions (they're JSON strings embedded in each region)
       const icMap = new Map<string, InterconnectorFlow>();
-      const regions: ElecSummaryRegion[] = summary.map((r: any) => {
+      const regions: ElecSummaryRegion[] = summary.map((r: RawElecSummaryRegion) => {
         // Parse the interconnectorFlows JSON string
-        let flows: any[] = [];
+        let flows: RawInterconnectorFlow[] = [];
         try {
           flows = typeof r.interconnectorFlows === 'string'
             ? JSON.parse(r.interconnectorFlows)

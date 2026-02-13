@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { nem } from '../api/client';
-import type { PriceAndDemandPoint, TimeScale } from '../api/types';
+import type { PriceAndDemandPoint, TimeScale, ApiItemsResponse, RawPriceAndDemandItem } from '../api/types';
 
 export function usePriceAndDemand(
   region: string,
@@ -12,8 +12,8 @@ export function usePriceAndDemand(
     queryFn: () => nem.priceAndDemand(region, timeScale),
     staleTime: 300_000,
     enabled,
-    select: (raw: any): PriceAndDemandPoint[] => {
-      const items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawPriceAndDemandItem>): PriceAndDemandPoint[] => {
+      const items: RawPriceAndDemandItem[] = raw?.data?.items ?? [];
       return items.map(i => ({
         dt: i.settlementDate,
         rrp: i.rrp,

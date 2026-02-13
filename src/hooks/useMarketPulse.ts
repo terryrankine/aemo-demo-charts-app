@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { wem } from '../api/client';
-import type { MarketPulsePoint } from '../api/types';
+import type { MarketPulsePoint, ApiItemsResponse, RawMarketPulseItem } from '../api/types';
 
 export function useMarketPulse(enabled = true) {
   return useQuery({
@@ -9,8 +9,8 @@ export function useMarketPulse(enabled = true) {
     staleTime: 300_000,
     refetchInterval: 300_000,
     enabled,
-    select: (raw: any): MarketPulsePoint[] => {
-      const items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawMarketPulseItem>): MarketPulsePoint[] => {
+      const items: RawMarketPulseItem[] = raw?.data?.items ?? [];
       return items.map(i => ({
         dt: i.tradingDayInterval,
         price: i.price ?? 0,

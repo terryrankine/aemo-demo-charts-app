@@ -99,3 +99,84 @@ export interface MarketPulsePoint {
   plannedOutageMw: number;
   forcedOutageMw: number;
 }
+
+// --- Raw API response shapes (before hook transformation) ---
+
+export interface ApiItemsResponse<T> {
+  data: { items: T[] };
+}
+
+export interface ElecSummaryApiResponse {
+  data: { summary: RawElecSummaryRegion[] };
+}
+
+export interface RawElecSummaryRegion {
+  regionId: string;
+  price: number;
+  totalDemand: number;
+  scheduledGeneration?: number;
+  semischeduledGeneration?: number;
+  netInterchange: number;
+  interconnectorFlows: string | RawInterconnectorFlow[];
+}
+
+export interface RawInterconnectorFlow {
+  name: string;
+  value: number;
+  exportlimit?: number;
+  importlimit?: number;
+}
+
+export interface RawPriceAndDemandItem {
+  settlementDate: string;
+  rrp: number;
+  totalDemand: number;
+  scheduledGeneration?: number;
+  semiScheduledGeneration?: number;
+  netInterchange?: number;
+}
+
+export interface RawFuelMixItem {
+  state: string;
+  fuelType: string;
+  supply?: number;
+  value?: number;
+}
+
+export interface RawMarketPulseItem {
+  tradingDayInterval: string;
+  price?: number;
+  forecastMw?: number;
+  forecastEoiMw?: number;
+  actualTotalGeneration: number | null;
+  actualNsgMw: number | null;
+  forecastNsgMw?: number;
+  rtdTotalGeneration?: number;
+  totalOutageMw?: number;
+  plannedOutageMw?: number;
+  forcedOutageMw?: number;
+}
+
+export interface RawRenewPenItem {
+  type: string;
+  fuelType: string;
+  supply?: number;
+  dateTime?: string;
+}
+
+export interface RawAvgPriceItem {
+  day?: string;
+  date?: string;
+  period?: string;
+  month?: string;
+  year?: string;
+  regionId?: string;
+  region?: string;
+  avgRrp: string | number;
+  peakRrp?: string | number;
+  YEAR?: string;
+  REGIONID?: string;
+  AVG_RRP?: number;
+  PEAK_RRP?: number;
+  FUEL_TYPE?: string;
+}

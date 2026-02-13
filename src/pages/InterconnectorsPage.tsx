@@ -1,6 +1,6 @@
 import { useElecSummary } from '../hooks/useElecSummary';
 import FlowMap from '../components/charts/FlowMap';
-import { REGION_LABELS } from '../api/types';
+import { REGION_LABELS, type InterconnectorFlow } from '../api/types';
 import './Pages.css';
 
 export default function InterconnectorsPage() {
@@ -41,7 +41,7 @@ export default function InterconnectorsPage() {
                 </tr>
               </thead>
               <tbody>
-                {interconnectors.map((ic: any) => {
+                {interconnectors.map((ic: InterconnectorFlow) => {
                   const absFlow = Math.abs(ic.mwFlow ?? 0);
                   const limit = Math.max(
                     Math.abs(ic.exportLimit ?? 0),

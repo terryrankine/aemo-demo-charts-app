@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { nem } from '../api/client';
-import type { AveragePricePoint } from '../api/types';
+import type { AveragePricePoint, ApiItemsResponse, RawAvgPriceItem } from '../api/types';
 
 const ONE_HOUR = 3_600_000;
 
@@ -14,13 +14,13 @@ export function useDailyAveragePrices(
     queryFn: () => nem.dailyAveragePrices(year, month),
     staleTime: ONE_HOUR,
     enabled,
-    select: (raw: any): AveragePricePoint[] => {
-      const items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawAvgPriceItem>): AveragePricePoint[] => {
+      const items: RawAvgPriceItem[] = raw?.data?.items ?? [];
       return items.map(i => ({
         period: i.day ?? i.date ?? i.period ?? '',
         region: i.regionId ?? i.region ?? '',
-        avgRrp: parseFloat(i.avgRrp) || 0,
-        peakRrp: parseFloat(i.peakRrp) || undefined,
+        avgRrp: parseFloat(String(i.avgRrp)) || 0,
+        peakRrp: parseFloat(String(i.peakRrp)) || undefined,
       }));
     },
   });
@@ -36,13 +36,13 @@ export function useMonthlyAveragePrices(
     queryFn: () => nem.monthlyAveragePrices(year, month),
     staleTime: ONE_HOUR,
     enabled,
-    select: (raw: any): AveragePricePoint[] => {
-      const items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawAvgPriceItem>): AveragePricePoint[] => {
+      const items: RawAvgPriceItem[] = raw?.data?.items ?? [];
       return items.map(i => ({
         period: i.month ?? i.period ?? '',
         region: i.regionId ?? i.region ?? '',
-        avgRrp: parseFloat(i.avgRrp) || 0,
-        peakRrp: parseFloat(i.peakRrp) || undefined,
+        avgRrp: parseFloat(String(i.avgRrp)) || 0,
+        peakRrp: parseFloat(String(i.peakRrp)) || undefined,
       }));
     },
   });
@@ -54,13 +54,13 @@ export function useAnnualAveragePrices(enabled = true) {
     queryFn: () => nem.annualAveragePrices(),
     staleTime: ONE_HOUR,
     enabled,
-    select: (raw: any): AveragePricePoint[] => {
-      const items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawAvgPriceItem>): AveragePricePoint[] => {
+      const items: RawAvgPriceItem[] = raw?.data?.items ?? [];
       return items.map(i => ({
         period: i.year ?? '',
         region: i.regionId ?? '',
-        avgRrp: parseFloat(i.avgRrp) || 0,
-        peakRrp: parseFloat(i.peakRrp) || undefined,
+        avgRrp: parseFloat(String(i.avgRrp)) || 0,
+        peakRrp: parseFloat(String(i.peakRrp)) || undefined,
       }));
     },
   });

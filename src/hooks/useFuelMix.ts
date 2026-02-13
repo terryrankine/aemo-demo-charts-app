@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { nem } from '../api/client';
-import type { FuelMixItem, FuelMixPeriod } from '../api/types';
+import type { FuelMixItem, FuelMixPeriod, ApiItemsResponse, RawFuelMixItem } from '../api/types';
 
 export function useFuelMix(
   region: string,
@@ -12,12 +12,12 @@ export function useFuelMix(
     queryFn: () => nem.fuelMix(region, period),
     staleTime: 300_000,
     enabled,
-    select: (raw: any): FuelMixItem[] => {
-      let items: any[] = raw?.data?.items ?? [];
+    select: (raw: ApiItemsResponse<RawFuelMixItem>): FuelMixItem[] => {
+      let items: RawFuelMixItem[] = raw?.data?.items ?? [];
 
       // API ignores region param — filter by state client-side
       if (region !== 'NEM') {
-        items = items.filter((i: any) => i.state === region);
+        items = items.filter((i: RawFuelMixItem) => i.state === region);
       }
 
       // Aggregate by fuelType

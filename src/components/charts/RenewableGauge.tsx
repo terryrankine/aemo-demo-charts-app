@@ -1,5 +1,5 @@
 import ReactECharts from 'echarts-for-react';
-import { useTheme } from '../../theme/ThemeContext';
+import { useTheme } from '../../theme/useTheme';
 import type { EChartsOption } from 'echarts';
 
 interface Props {

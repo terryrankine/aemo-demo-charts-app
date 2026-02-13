@@ -5,7 +5,7 @@ import KpiCard from '../components/charts/KpiCard';
 import HorizontalBar from '../components/charts/HorizontalBar';
 import FlowMap from '../components/charts/FlowMap';
 import { getFuelColor } from '../theme/fuel-colors';
-import { REGION_LABELS } from '../api/types';
+import { REGION_LABELS, type ElecSummaryRegion, type FuelMixItem } from '../api/types';
 import './Pages.css';
 
 export default function OverviewPage() {
@@ -31,11 +31,11 @@ export default function OverviewPage() {
   const wemPrice = wemLatest?.price ?? 0;
   const wemDemand = wemLatestActual?.actualTotalGeneration ?? wemLatest?.forecastMw ?? 0;
 
-  const fuelItems = (fuelMix ?? []).map((item: any) => ({
-    name: item.fuelType ?? item.name ?? 'Unknown',
+  const fuelItems = (fuelMix ?? []).map((item: FuelMixItem) => ({
+    name: item.fuelType ?? 'Unknown',
     value: item.value ?? 0,
-    color: getFuelColor(item.fuelType ?? item.name ?? ''),
-  })).filter((i: any) => i.value > 0);
+    color: getFuelColor(item.fuelType ?? ''),
+  })).filter(i => i.value > 0);
 
   return (
     <div className="page">
@@ -45,7 +45,7 @@ export default function OverviewPage() {
       </div>
 
       <div className="kpi-grid">
-        {regions.map((r: any) => (
+        {regions.map((r: ElecSummaryRegion) => (
           <KpiCard
             key={r.region}
             label={REGION_LABELS[r.region] ?? r.region}

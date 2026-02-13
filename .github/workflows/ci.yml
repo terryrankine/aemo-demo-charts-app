@@ -19,8 +19,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    # Pre-existing lint warnings — set to false once all resolved
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

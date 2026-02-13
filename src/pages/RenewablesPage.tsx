@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRenewablePenetration } from '../hooks/useRenewablePenetration';
 import { useFuelMix } from '../hooks/useFuelMix';
 import RenewableGauge from '../components/charts/RenewableGauge';
@@ -7,30 +7,35 @@ import KpiCard from '../components/charts/KpiCard';
 import RegionSelector from '../components/controls/RegionSelector';
 import CompareToggle from '../components/controls/CompareToggle';
 import ViewModeToggle, { type ViewMode } from '../components/controls/ViewModeToggle';
-import { NEM_REGIONS, REGION_LABELS } from '../api/types';
+import { NEM_REGIONS, REGION_LABELS, type FuelMixItem } from '../api/types';
 import { REGION_COLORS, getFuelColor, isRenewable } from '../theme/fuel-colors';
+import type { BarItem } from '../components/charts/HorizontalBar';
 import './Pages.css';
 
 const REGION_OPTIONS = [{ id: 'NEM', label: 'NEM' }, ...NEM_REGIONS];
 
-function parseFuels(fuelMix: any[]) {
-  const allFuels = (fuelMix ?? []).map((item: any) => ({
-    name: item.fuelType ?? item.FUEL_TYPE ?? item.name ?? 'Unknown',
-    value: item.value ?? item.currentMW ?? item.MW ?? 0,
-    color: getFuelColor(item.fuelType ?? item.FUEL_TYPE ?? item.name ?? ''),
-    renewable: isRenewable(item.fuelType ?? item.FUEL_TYPE ?? item.name ?? ''),
-  })).filter((i: any) => i.value > 0);
+interface ParsedFuels {
+  renewables: BarItem[];
+  fossils: BarItem[];
+}
+
+function parseFuels(fuelMix: FuelMixItem[]): ParsedFuels {
+  const allFuels = fuelMix.map((item: FuelMixItem) => ({
+    name: item.fuelType ?? 'Unknown',
+    value: item.value ?? 0,
+    color: getFuelColor(item.fuelType ?? ''),
+    renewable: isRenewable(item.fuelType ?? ''),
+  })).filter(i => i.value > 0);
 
   return {
-    renewables: allFuels.filter((f: any) => f.renewable),
-    fossils: allFuels.filter((f: any) => !f.renewable),
+    renewables: allFuels.filter(f => f.renewable),
+    fossils: allFuels.filter(f => !f.renewable),
   };
 }
 
-/** Compute renewable penetration % from fuel mix items */
-function calcPenetration(renewables: any[], fossils: any[]): number {
-  const renewTotal = renewables.reduce((s: number, i: any) => s + i.value, 0);
-  const allTotal = renewTotal + fossils.reduce((s: number, i: any) => s + i.value, 0);
+function calcPenetration(renewables: BarItem[], fossils: BarItem[]): number {
+  const renewTotal = renewables.reduce((s: number, i: BarItem) => s + i.value, 0);
+  const allTotal = renewTotal + fossils.reduce((s: number, i: BarItem) => s + i.value, 0);
   return allTotal > 0 ? (renewTotal / allTotal) * 100 : 0;
 }
 
@@ -40,18 +45,31 @@ export default function RenewablesPage() {
   const [regionB, setRegionB] = useState<string>('VIC1');
   const [viewMode, setViewMode] = useState<ViewMode>('overlay');
 
-  // If region B matches region A, pick a different one
-  useEffect(() => {
-    if (compareEnabled && regionB === region) {
+  // Derive effective regionB (auto-fix when it matches regionA)
+  const effectiveRegionB = (compareEnabled && regionB === region)
+    ? (REGION_OPTIONS.find(r => r.id !== region)?.id ?? regionB)
+    : regionB;
+
+  const handleRegionChange = (newRegion: string) => {
+    setRegion(newRegion);
+    if (compareEnabled && regionB === newRegion) {
+      const alt = REGION_OPTIONS.find(r => r.id !== newRegion);
+      if (alt) setRegionB(alt.id);
+    }
+  };
+
+  const handleCompareChange = (enabled: boolean) => {
+    setCompareEnabled(enabled);
+    if (enabled && regionB === region) {
       const alt = REGION_OPTIONS.find(r => r.id !== region);
       if (alt) setRegionB(alt.id);
     }
-  }, [compareEnabled, region, regionB]);
+  };
 
   // renewablePenetration only provides NEM-wide min/max records
   const { data: penetration, isLoading: loadingPen, isError: errPen } = useRenewablePenetration(region);
   const { data: fuelMix, isLoading: loadingFuel, isError: errFuel } = useFuelMix(region, 'CURRENT');
-  const { data: fuelMixB, isLoading: loadingFuelB } = useFuelMix(regionB, 'CURRENT', compareEnabled);
+  const { data: fuelMixB, isLoading: loadingFuelB } = useFuelMix(effectiveRegionB, 'CURRENT', compareEnabled);
 
   const isLoading = loadingPen || loadingFuel || (compareEnabled && loadingFuelB);
 
@@ -68,13 +86,13 @@ export default function RenewablesPage() {
 
   const regionBOptions = REGION_OPTIONS.filter(r => r.id !== region);
   const regionALabel = REGION_LABELS[region] ?? region;
-  const regionBLabel = REGION_LABELS[regionB] ?? regionB;
+  const regionBLabel = REGION_LABELS[effectiveRegionB] ?? effectiveRegionB;
 
   const renderPanel = (
     label: string,
     pen: number,
-    renew: any[],
-    fossil: any[],
+    renew: BarItem[],
+    fossil: BarItem[],
   ) => (
     <div className="comparison-panel">
       <div className="gauge-kpi-row">
@@ -112,11 +130,11 @@ export default function RenewablesPage() {
           <RegionSelector
             regions={REGION_OPTIONS}
             selected={region}
-            onChange={setRegion}
+            onChange={handleRegionChange}
           />
           <CompareToggle
             enabled={compareEnabled}
-            onChange={setCompareEnabled}
+            onChange={handleCompareChange}
           />
           {compareEnabled && (
             <>
@@ -124,7 +142,7 @@ export default function RenewablesPage() {
                 <div className="region-label">vs</div>
                 <RegionSelector
                   regions={regionBOptions}
-                  selected={regionB}
+                  selected={effectiveRegionB}
                   onChange={setRegionB}
                 />
               </div>
@@ -173,7 +191,7 @@ export default function RenewablesPage() {
                 regionALabel={regionALabel}
                 regionBLabel={regionBLabel}
                 regionAColor={REGION_COLORS[region] ?? '#4A90D9'}
-                regionBColor={REGION_COLORS[regionB] ?? '#E74C3C'}
+                regionBColor={REGION_COLORS[effectiveRegionB] ?? '#E74C3C'}
                 itemsB={renewablesB}
               />
             </div>
@@ -185,7 +203,7 @@ export default function RenewablesPage() {
                 regionALabel={regionALabel}
                 regionBLabel={regionBLabel}
                 regionAColor={REGION_COLORS[region] ?? '#4A90D9'}
-                regionBColor={REGION_COLORS[regionB] ?? '#E74C3C'}
+                regionBColor={REGION_COLORS[effectiveRegionB] ?? '#E74C3C'}
                 itemsB={fossilsB}
               />
             </div>
