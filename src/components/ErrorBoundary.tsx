@@ -32,7 +32,7 @@ export default class ErrorBoundary extends Component<Props, State> {
         <div style={{ padding: 32, textAlign: 'center', color: '#ef4444' }}>
           <h2>Something went wrong</h2>
           <p style={{ color: '#888', fontSize: 14 }}>
-            {this.state.error?.message ?? 'An unexpected error occurred'}
+            {import.meta.env.PROD ? 'An unexpected error occurred' : (this.state.error?.message ?? 'An unexpected error occurred')}
           </p>
           <button
             onClick={() => this.setState({ hasError: false, error: null })}

@@ -155,7 +155,7 @@ export default function RenewablesPage() {
       {isLoading ? (
         <div className="page-loading">Loading renewables data...</div>
       ) : (errPen || errFuel) ? (
-        <div className="page-loading" style={{ color: '#ef4444' }}>Failed to load renewables data.</div>
+        <div className="page-loading page-error">Failed to load renewables data.</div>
       ) : compareEnabled && viewMode === 'split' ? (
         <div className="comparison-split">
           {renderPanel(regionALabel, currentPenetration, renewables, fossils)}

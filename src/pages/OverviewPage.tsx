@@ -18,7 +18,7 @@ export default function OverviewPage() {
   }
 
   if (errSummary) {
-    return <div className="page-loading" style={{ color: '#ef4444' }}>Failed to load market data. AEMO API may be unavailable.</div>;
+    return <div className="page-loading page-error">Failed to load market data. AEMO API may be unavailable.</div>;
   }
 
   const regions = summary?.regions ?? [];

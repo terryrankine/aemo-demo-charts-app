@@ -123,7 +123,7 @@ export default function FuelMixPage() {
       {loading ? (
         <div className="page-loading">Loading fuel mix data...</div>
       ) : isError ? (
-        <div className="page-loading" style={{ color: '#ef4444' }}>Failed to load fuel mix data.</div>
+        <div className="page-loading page-error">Failed to load fuel mix data.</div>
       ) : compareEnabled && viewMode === 'split' ? (
         <>
           <div className="comparison-split">

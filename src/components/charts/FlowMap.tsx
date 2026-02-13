@@ -39,7 +39,7 @@ export default function FlowMap({ regions, interconnectors }: Props) {
 
   return (
     <div className="flow-map">
-      <svg viewBox="0 0 100 100" className="flow-map-svg">
+      <svg viewBox="0 0 100 100" className="flow-map-svg" role="img" aria-label="NEM interconnector flow map showing power transfers between regions">
         {/* Interconnector lines */}
         {interconnectors.map((ic) => {
           const from = REGION_POS[ic.exportRegion];
@@ -100,12 +100,16 @@ export default function FlowMap({ regions, interconnectors }: Props) {
           <div
             key={regionId}
             className="region-node"
+            role="button"
+            tabIndex={0}
+            aria-label={`View ${regionId.replace(/1$/, '')} price and demand details`}
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
               borderColor: priceColor(region.price),
             }}
             onClick={() => navigate(`/price-demand?region=${regionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/price-demand?region=${regionId}`); } }}
           >
             <span className="region-name">{regionId.replace(/1$/, '')}</span>
             <span className="region-price" style={{ color: priceColor(region.price) }}>

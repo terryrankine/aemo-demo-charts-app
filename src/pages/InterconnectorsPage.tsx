@@ -19,7 +19,7 @@ export default function InterconnectorsPage() {
       {isLoading ? (
         <div className="page-loading">Loading interconnector data...</div>
       ) : isError ? (
-        <div className="page-loading" style={{ color: '#ef4444' }}>Failed to load interconnector data.</div>
+        <div className="page-loading page-error">Failed to load interconnector data.</div>
       ) : (
         <>
           <div className="card flow-map-large">

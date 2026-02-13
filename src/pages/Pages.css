@@ -38,6 +38,10 @@
   font-size: 0.9rem;
 }
 
+.page-error {
+  color: var(--negative);
+}
+
 /* KPI Grid */
 .kpi-grid {
   display: grid;

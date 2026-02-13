@@ -20,7 +20,9 @@ const NEM_COMPARE_REGIONS = NEM_REGIONS;
 
 export default function PriceDemandPage() {
   const [searchParams] = useSearchParams();
-  const initialRegion = searchParams.get('region') ?? 'NSW1';
+  const validRegionIds = new Set(ALL_REGIONS.map(r => r.id));
+  const rawRegion = searchParams.get('region') ?? 'NSW1';
+  const initialRegion = validRegionIds.has(rawRegion) ? rawRegion : 'NSW1';
   const [region, setRegion] = useState<string>(initialRegion);
   const [timeScale, setTimeScale] = useState<TimeScale>('5MIN');
   const [compareEnabled, setCompareEnabled] = useState(false);
@@ -232,7 +234,7 @@ export default function PriceDemandPage() {
       {isLoading ? (
         <div className="page-loading">Loading price & demand data...</div>
       ) : isError ? (
-        <div className="page-loading" style={{ color: '#ef4444' }}>Failed to load price & demand data.</div>
+        <div className="page-loading page-error">Failed to load price & demand data.</div>
       ) : isWem && wemOption ? (
         <div className="card">
           <ReactECharts option={wemOption} style={{ height: 450 }} notMerge />

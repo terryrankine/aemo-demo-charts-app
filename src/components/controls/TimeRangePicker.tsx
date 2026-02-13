@@ -16,11 +16,13 @@ interface Props {
 
 export default function TimeRangePicker({ selected, onChange }: Props) {
   return (
-    <div className="control-group">
+    <div className="control-group" role="radiogroup" aria-label="Time range">
       {PERIODS.map(({ id, label }) => (
         <button
           key={id}
           className={`control-btn ${selected === id ? 'active' : ''}`}
+          role="radio"
+          aria-checked={selected === id}
           onClick={() => onChange(id)}
         >
           {label}

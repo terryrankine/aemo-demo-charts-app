@@ -9,15 +9,19 @@ interface Props {
 
 export default function ViewModeToggle({ mode, onChange }: Props) {
   return (
-    <div className="control-group">
+    <div className="control-group" role="radiogroup" aria-label="View mode">
       <button
         className={`control-btn ${mode === 'overlay' ? 'active' : ''}`}
+        role="radio"
+        aria-checked={mode === 'overlay'}
         onClick={() => onChange('overlay')}
       >
         Overlay
       </button>
       <button
         className={`control-btn ${mode === 'split' ? 'active' : ''}`}
+        role="radio"
+        aria-checked={mode === 'split'}
         onClick={() => onChange('split')}
       >
         Split

@@ -5,9 +5,7 @@ export interface FuelConfig {
 }
 
 export const FUEL_COLORS: Record<string, FuelConfig> = {
-  'Black coal':   { color: '#333536', label: 'Black Coal', renewable: false },
   'Black Coal':   { color: '#333536', label: 'Black Coal', renewable: false },
-  'Brown coal':   { color: '#97785C', label: 'Brown Coal', renewable: false },
   'Brown Coal':   { color: '#97785C', label: 'Brown Coal', renewable: false },
   'Gas':          { color: '#34B9B3', label: 'Gas', renewable: false },
   'Natural Gas':  { color: '#34B9B3', label: 'Natural Gas', renewable: false },
@@ -23,12 +21,21 @@ export const FUEL_COLORS: Record<string, FuelConfig> = {
   'Distributed PV': { color: '#FFED90', label: 'Distributed PV', renewable: true },
 };
 
+// Case-insensitive lookup index built once
+const FUEL_COLORS_LOWER = new Map(
+  Object.entries(FUEL_COLORS).map(([k, v]) => [k.toLowerCase(), v])
+);
+
+function lookupFuel(fuelType: string): FuelConfig | undefined {
+  return FUEL_COLORS[fuelType] ?? FUEL_COLORS_LOWER.get(fuelType.toLowerCase());
+}
+
 export function getFuelColor(fuelType: string): string {
-  return FUEL_COLORS[fuelType]?.color ?? '#888888';
+  return lookupFuel(fuelType)?.color ?? '#888888';
 }
 
 export function isRenewable(fuelType: string): boolean {
-  return FUEL_COLORS[fuelType]?.renewable ?? false;
+  return lookupFuel(fuelType)?.renewable ?? false;
 }
 
 // Ordered for stacked charts - fossils at bottom, renewables on top

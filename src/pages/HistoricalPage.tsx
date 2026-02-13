@@ -67,7 +67,7 @@ export default function HistoricalPage() {
       {isLoading ? (
         <div className="page-loading">Loading historical data...</div>
       ) : (errAnnual || errMonthly) ? (
-        <div className="page-loading" style={{ color: '#ef4444' }}>Failed to load historical data.</div>
+        <div className="page-loading page-error">Failed to load historical data.</div>
       ) : (
         <>
           <div className="card">

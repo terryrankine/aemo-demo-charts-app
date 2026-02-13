@@ -4,6 +4,10 @@ import { darkTheme, lightTheme } from '../../theme/echarts-theme';
 import type { EChartsOption } from 'echarts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 export interface BarItem {
   name: string;
   value: number;
@@ -63,9 +67,9 @@ export default function HorizontalBar({
         axisPointer: { type: 'shadow' },
         formatter: (params: CallbackDataParams | CallbackDataParams[]) => {
           const arr = Array.isArray(params) ? params : [params];
-          let html = `<strong>${arr[0]?.name ?? ''}</strong><br/>`;
+          let html = `<strong>${escapeHtml(String(arr[0]?.name ?? ''))}</strong><br/>`;
           for (const p of arr) {
-            html += `${String(p.marker ?? '')} ${p.seriesName ?? ''}: ${Number(p.value ?? 0).toLocaleString()} ${unit}<br/>`;
+            html += `${String(p.marker ?? '')} ${escapeHtml(String(p.seriesName ?? ''))}: ${Number(p.value ?? 0).toLocaleString()} ${escapeHtml(unit)}<br/>`;
           }
           return html;
         },
@@ -147,7 +151,7 @@ export default function HorizontalBar({
       axisPointer: { type: 'shadow' },
       formatter: (params: CallbackDataParams | CallbackDataParams[]) => {
         const p = Array.isArray(params) ? params[0] : params;
-        return `${p.name ?? ''}: ${Number(p.value ?? 0).toLocaleString()} ${unit}`;
+        return `${escapeHtml(String(p.name ?? ''))}: ${Number(p.value ?? 0).toLocaleString()} ${escapeHtml(unit)}`;
       },
     },
     grid: {
