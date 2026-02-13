@@ -30,3 +30,10 @@ docs/AEMOVis-Guide.docx
 # Dev screenshots (not needed in repo)
 /*.png
 nul
+
+# Test coverage
+coverage/
+
+# Storybook
+*storybook.log
+storybook-static/

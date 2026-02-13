@@ -26,8 +26,8 @@ export function useElecSummary(enabled = true) {
           flows = typeof r.interconnectorFlows === 'string'
             ? JSON.parse(r.interconnectorFlows)
             : r.interconnectorFlows ?? [];
-        } catch (e) {
-          console.warn('Failed to parse interconnector flows:', e);
+        } catch {
+          // Malformed JSON in interconnector data — skip gracefully
         }
 
         for (const f of flows) {

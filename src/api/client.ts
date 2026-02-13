@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger';
+
 const API_KEY = import.meta.env.VITE_AEMO_API_KEY ?? '';
 
 export async function aemoFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
@@ -7,14 +9,18 @@ export async function aemoFetch<T>(path: string, params?: Record<string, string>
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
 
+  const start = performance.now();
   const res = await fetch(url.toString(), {
     headers: { 'x-api-key': API_KEY },
   });
+  const duration = Math.round(performance.now() - start);
 
   if (!res.ok) {
+    logger.error('API request failed', { path, status: res.status, duration });
     throw new Error(`AEMO API error: ${res.status} ${res.statusText}`);
   }
 
+  logger.debug('API request completed', { path, status: res.status, duration });
   return res.json();
 }
 
