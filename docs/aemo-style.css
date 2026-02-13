@@ -1,0 +1,269 @@
+/* AEMOVis Document Styling — AEMO Brand Colours */
+/* For use with pandoc + wkhtmltopdf PDF generation */
+
+/* ===== Page Layout ===== */
+@page {
+  margin: 25mm 20mm 25mm 20mm;
+  size: A4;
+}
+
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: #333333;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Headings ===== */
+h1 {
+  color: #360F3C;
+  font-size: 24pt;
+  font-weight: 700;
+  border-bottom: 3px solid #702F73;
+  padding-bottom: 8px;
+  margin-top: 40px;
+  page-break-before: always;
+}
+
+h1:first-of-type {
+  page-break-before: avoid;
+}
+
+h2 {
+  color: #702F73;
+  font-size: 18pt;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+  margin-top: 30px;
+}
+
+h3 {
+  color: #4B2651;
+  font-size: 14pt;
+  font-weight: 600;
+  margin-top: 24px;
+}
+
+h4 {
+  color: #702F73;
+  font-size: 12pt;
+  font-weight: 600;
+  margin-top: 18px;
+}
+
+/* ===== Links ===== */
+a {
+  color: #3379BF;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Tables ===== */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+  font-size: 10pt;
+  page-break-inside: avoid;
+}
+
+thead th {
+  background-color: #360F3C;
+  color: #FFFFFF;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid #360F3C;
+}
+
+tbody td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #F0F0F0;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #FFFFFF;
+}
+
+tbody tr:hover {
+  background-color: #E8E0EA;
+}
+
+/* ===== Code Blocks ===== */
+code {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 9.5pt;
+  background-color: #F5F2F6;
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: #4B2651;
+}
+
+pre {
+  background-color: #F5F2F6;
+  border: 1px solid #ddd;
+  border-left: 4px solid #702F73;
+  padding: 12px 16px;
+  overflow-x: auto;
+  font-size: 9pt;
+  line-height: 1.5;
+  border-radius: 4px;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* ===== Images ===== */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Blockquotes ===== */
+blockquote {
+  border-left: 4px solid #702F73;
+  margin: 16px 0;
+  padding: 8px 16px;
+  background-color: #F8F5F9;
+  color: #4B2651;
+}
+
+blockquote p {
+  margin: 4px 0;
+}
+
+/* ===== Lists ===== */
+ul, ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+/* ===== Horizontal Rule ===== */
+hr {
+  border: none;
+  border-top: 2px solid #702F73;
+  margin: 30px 0;
+}
+
+/* ===== Table of Contents ===== */
+#TOC {
+  background-color: #F8F5F9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px 24px;
+  margin: 20px 0 40px 0;
+}
+
+#TOC ul {
+  list-style: none;
+  padding-left: 16px;
+}
+
+#TOC > ul {
+  padding-left: 0;
+}
+
+#TOC li {
+  margin: 4px 0;
+}
+
+#TOC a {
+  color: #702F73;
+  text-decoration: none;
+}
+
+#TOC a:hover {
+  color: #3379BF;
+}
+
+/* ===== Title Block ===== */
+.title {
+  font-size: 32pt;
+  color: #360F3C;
+  text-align: center;
+  margin-top: 100px;
+  margin-bottom: 8px;
+  border: none;
+  page-break-before: avoid;
+}
+
+.subtitle {
+  font-size: 16pt;
+  color: #702F73;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.date {
+  font-size: 12pt;
+  color: #747474;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.author {
+  font-size: 12pt;
+  color: #747474;
+  text-align: center;
+}
+
+/* ===== Colour Swatches (inline) ===== */
+.colour-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 4px;
+  border: 1px solid #ccc;
+}
+
+/* ===== Print-friendly ===== */
+@media print {
+  body {
+    font-size: 10.5pt;
+  }
+
+  h1 {
+    page-break-before: always;
+  }
+
+  h1:first-of-type {
+    page-break-before: avoid;
+  }
+
+  table, pre, img, blockquote {
+    page-break-inside: avoid;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #747474;
+  }
+}

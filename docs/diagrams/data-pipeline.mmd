@@ -1,0 +1,17 @@
+flowchart TD
+    API["🔌 AEMO Public API"] --> Proxy["⚡ Vite Dev Proxy<br/>/api → dashboards.public.aemo.com.au"]
+    Proxy --> Client["📡 API Client<br/>aemoFetch() + x-api-key header"]
+    Client --> RQ["💾 TanStack React Query<br/>Cache + staleTime + refetch"]
+    RQ --> Hooks["🔧 Custom Hooks<br/>select / transform data"]
+    Hooks --> Pages["📄 Page Components<br/>Layout + Controls + State"]
+    Pages --> Charts["📊 ECharts Components<br/>Dual Axis · Bar · Gauge · Area"]
+    Pages --> SVG["🗺️ SVG Flow Map<br/>Interconnector Visualization"]
+
+    style API fill:#360F3C,stroke:#333,color:#fff
+    style Proxy fill:#702F73,stroke:#333,color:#fff
+    style Client fill:#4B2651,stroke:#333,color:#fff
+    style RQ fill:#3379BF,stroke:#333,color:#fff
+    style Hooks fill:#4A90D9,stroke:#333,color:#fff
+    style Pages fill:#2ECC71,stroke:#333,color:#fff
+    style Charts fill:#F39C12,stroke:#333,color:#fff
+    style SVG fill:#E74C3C,stroke:#333,color:#fff

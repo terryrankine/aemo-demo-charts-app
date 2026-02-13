@@ -1,0 +1,11 @@
+graph LR
+    Browser["🌐 Browser<br/>(React SPA)"] -->|"fetch /api/*"| ViteProxy["⚡ Vite Dev Proxy<br/>localhost:5173"]
+    ViteProxy -->|"HTTPS + x-api-key"| AEMO["🔌 AEMO Public API<br/>dashboards.public.aemo.com.au"]
+    AEMO --> NEM["NEM Endpoints<br/>(10 endpoints)"]
+    AEMO --> WEM["WEM Endpoints<br/>(1 endpoint)"]
+
+    style Browser fill:#4A90D9,stroke:#333,color:#fff
+    style ViteProxy fill:#702F73,stroke:#333,color:#fff
+    style AEMO fill:#360F3C,stroke:#333,color:#fff
+    style NEM fill:#2ECC71,stroke:#333,color:#fff
+    style WEM fill:#F39C12,stroke:#333,color:#fff

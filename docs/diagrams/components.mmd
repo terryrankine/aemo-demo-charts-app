@@ -1,0 +1,35 @@
+graph TD
+    App["App"] --> QC["QueryClientProvider"]
+    QC --> TP["ThemeProvider"]
+    TP --> Router["BrowserRouter"]
+    Router --> Layout["AppLayout"]
+    Layout --> Sidebar["Sidebar<br/>Navigation + Theme Toggle"]
+    Layout --> Outlet["Route Outlet"]
+    Outlet --> Overview["OverviewPage<br/>/ "]
+    Outlet --> PriceDemand["PriceDemandPage<br/>/price-demand"]
+    Outlet --> FuelMix["FuelMixPage<br/>/fuel-mix"]
+    Outlet --> Renewables["RenewablesPage<br/>/renewables"]
+    Outlet --> Interconnectors["InterconnectorsPage<br/>/interconnectors"]
+    Outlet --> Historical["HistoricalPage<br/>/historical"]
+
+    Overview --> KpiCard["KpiCard"]
+    Overview --> FlowMap["FlowMap (SVG)"]
+    Overview --> HBar1["HorizontalBar"]
+    PriceDemand --> DualAxis["DualAxisChart"]
+    PriceDemand --> KpiCard2["KpiCard"]
+    FuelMix --> HBar2["HorizontalBar"]
+    Renewables --> Gauge["RenewableGauge"]
+    Renewables --> HBar3["HorizontalBar"]
+
+    style App fill:#360F3C,stroke:#333,color:#fff
+    style QC fill:#3379BF,stroke:#333,color:#fff
+    style TP fill:#702F73,stroke:#333,color:#fff
+    style Router fill:#4B2651,stroke:#333,color:#fff
+    style Layout fill:#4A90D9,stroke:#333,color:#fff
+    style Sidebar fill:#747474,stroke:#333,color:#fff
+    style Overview fill:#2ECC71,stroke:#333,color:#fff
+    style PriceDemand fill:#2ECC71,stroke:#333,color:#fff
+    style FuelMix fill:#2ECC71,stroke:#333,color:#fff
+    style Renewables fill:#2ECC71,stroke:#333,color:#fff
+    style Interconnectors fill:#2ECC71,stroke:#333,color:#fff
+    style Historical fill:#2ECC71,stroke:#333,color:#fff
