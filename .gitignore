@@ -37,3 +37,6 @@ coverage/
 # Storybook
 *storybook.log
 storybook-static/
+
+# Auto-generated vitest shims
+vitest.shims.d.ts
